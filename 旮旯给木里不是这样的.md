@@ -416,6 +416,14 @@ C. [具体行动]
 D. 输入任何你想做的事情
 ```
 
+### ⚠ 存盘操作
+
+每轮输出结束后，必须立即执行以下操作再发送回复：
+
+1. `read_file(".game/story.json")` → `play_sessions` +1 → `write_file(".game/story.json")`
+
+此操作不可跳过。play_sessions 是每轮的强制计数器，不是剧情计数器。
+
 ---
 
 # 叙事哲学
