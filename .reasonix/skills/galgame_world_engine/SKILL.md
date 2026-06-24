@@ -166,7 +166,7 @@ Reasonix 在上下文接近容量时会自动压缩历史对话。
   "narrative_budget": {
     "max_active_mysteries": 5,
     "max_active_foreshadowing": 10,
-    "max_core_characters": 7
+    "max_core_characters": 7   // 仅计可攻略角色（女主），配角、路人、男性朋友、NPC 不计入
   },
   "npc_schedules": {
     "<角色id>": { "morning": "场所或活动", "afternoon": "场所或活动", "evening": "场所或活动" }
@@ -239,7 +239,7 @@ Phase1:日常 → Phase2:异变 → Phase3:调查 → Phase4:路线锁定 → Ph
 
 - 主谜团：1~2 个
 - 次级谜团：2~5 个
-- 核心角色：3~7 人
+- 核心角色：3~7 人（仅计可攻略角色 / 女主，配角、路人、男性朋友不在此限）
 - 活跃伏笔：≤10
 - 活跃未解问题：≤10
 
