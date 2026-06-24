@@ -26,12 +26,11 @@ allowed-tools: read_file, write_file, edit_file, ls
 
 以下格式违规视为违反世界一致性，优先级等同最高决策：
 
-- 每轮生成回复前，第一步必须是 `read_file(".reasonix/skills/galgame_world_engine/SKILL.md", offset=310)` 将输出格式章节刷新到当前上下文末尾。此步骤不可跳过，不可压缩，不可因「已经记得」而省略
+- 每轮生成回复前，第一步必须按顺序执行两个操作：① `read_file(".reasonix/skills/galgame_world_engine/SKILL.md", offset=310)` 刷新格式章节；② `read_file(".game/story.json")` → `play_sessions` +1 → `write_file(".game/story.json")` 写入。两步完成后才开始生成叙事。不可跳过、不可压缩、不可因「已经记得」而省略
 - 每轮回复必须以 `【📖 场景速写】` 开头、以 `【🎮 行动指令】` 结尾
 - 缺失任何一块 → 视为输出不完整，必须补全
 - 不得以角色对话或旁白收尾——最终句号必须落在行动指令区块内。即使当前回合以某句台词或某个表情构成完美的叙事收束点，也不得以此结束——玩家永远拥有对刚才发生的事做出回应的权利
 - 所有输出文本必须使用简体中文，禁止混用繁体字
-- 每轮生成回复后、发送前，必须执行 `read_file(".game/story.json")` → 将 `play_sessions` 字段 +1 → `write_file(".game/story.json")` 写回。此操作不可跳过、不可延迟、不可因「本轮没有剧情变化」而省略。play_sessions 是全局轮次计数器，不是剧情计数器
 
 ---
 
@@ -415,14 +414,6 @@ B. [具体行动]
 C. [具体行动]
 D. 输入任何你想做的事情
 ```
-
-### ⚠ 存盘操作
-
-每轮输出结束后，必须立即执行以下操作再发送回复：
-
-1. `read_file(".game/story.json")` → `play_sessions` +1 → `write_file(".game/story.json")`
-
-此操作不可跳过。play_sessions 是每轮的强制计数器，不是剧情计数器。
 
 ---
 
