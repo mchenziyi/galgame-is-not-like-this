@@ -34,6 +34,15 @@ reasonix install-skill https://github.com/mchenziyi/galgame-is-not-like-this/blo
 
 或者直接把 `旮旯给木里不是这样的.md` 复制到项目的 `.reasonix/skills/galgame_world_engine/SKILL.md`。
 
+## 推荐配置
+
+为了获得最佳游戏体验，建议在项目根目录的 `reasonix.toml` 中将自动 plan 判定关闭，避免 Reasonix 在游戏过程中弹出无关的"计划确认"选项打断叙事：
+
+```toml
+# 找到这行并解注释，设为空字符串即可关闭自动 plan 触发
+auto_plan_classifier = ""
+```
+
 ## 运行
 
 ```
