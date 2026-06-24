@@ -44,6 +44,7 @@ allowed-tools: read_file, write_file, edit_file, ls
 
 | 文件 | 内容 | 更新频率 |
 |---|---|---|
+| `.game/meta.json` | 全局计数器（ID 生成用） | 每次生成新 ID 时 |
 | `.game/world.json` | 实体图谱 + 关系 | 图谱变动时 |
 | `.game/characters.json` | 角色档案 + 关系数值 | 角色状态变动时 |
 | `.game/story.json` | 故事进度 + 叙事状态 | 每轮结束 |
@@ -52,7 +53,7 @@ allowed-tools: read_file, write_file, edit_file, ls
 ## 启动流程
 
 1. 尝试 `read_file(".game/story.json")`
-2. 读取成功 → 继续读取其余三个存档 → 从上次状态恢复
+2. 读取成功 → 继续读取其余四个存档（world / characters / story / timeline / meta.json）→ 从上次状态恢复
 3. 读取失败（文件不存在、目录不存在、任何错误均视为首次运行）→ 执行初始化流程 → 写入全部存档 → 开始第一幕
 4. 状态恢复完毕后，执行 `read_file(".reasonix/skills/galgame_world_engine/SKILL.md", offset=305)` 重读输出格式章节，将其刷新到当前上下文的最末尾——确保格式指令紧贴生成点，不被长对话淹没
 
@@ -69,6 +70,8 @@ allowed-tools: read_file, write_file, edit_file, ls
 - 初始氛围：平静、温暖、略带孤独感
 
 此模板仅提供骨架。角色姓名、具体性格、具体秘密由引擎在首次运行时自主生成，但必须在生成后立即写入存档，确保后续一致。
+
+初始化时，必须同时创建 `.game/meta.json`，将 `next_event_id` 设为 1、`next_arc_id` 设为 2、`next_foreshadowing_id` 和 `next_background_id` 均设为 1。
 
 ## 存盘时机
 
@@ -248,6 +251,28 @@ importance 等级：main / side / relationship / mystery
 
 ---
 
+## meta.json — ID 计数器
+
+```json
+{
+  "_version": 1,
+  "next_event_id": 1,
+  "next_arc_id": 2,
+  "next_foreshadowing_id": 1,
+  "next_background_id": 1
+}
+```
+
+全局单调递增，禁止手编 ID。生成新实体/事件/伏笔/Arc 时：
+1. `read_file(".game/meta.json")` 读取当前计数器
+2. 取对应字段的值作为 ID 序号 → 生成 `EVT_<next_event_id>` / `ARC_<next_arc_id>` / `FS_<next_foreshadowing_id>` / `BG_<next_background_id>`
+3. 对应计数器 +1 → `write_file(".game/meta.json")`
+4. 再用新 ID 创建条目
+
+初始化时 `next_event_id` 从 1 开始，`next_arc_id` 从 2 开始（ARC_001 已被默认 Arc 占用）。
+
+---
+
 # 叙事系统
 
 ## 节奏推进
@@ -257,6 +282,10 @@ Phase1:日常 → Phase2:异变 → Phase3:调查 → Phase4:路线锁定 → Ph
 ```
 
 推进顺序：人物关系 → 日常积累 → 伏笔埋设 → 谜团展开 → 真相浮现 → 路线形成 → 结局达成
+
+### 时间推进
+
+`current_day` 必须在叙事中自然递增，禁止多轮对话停滞在同一时刻。一个场景（一顿饭、一次散步）通常不超过半天；跨越半天的事件需在场景速写中体现光线/时间变化。每经过若干轮自然推进一天——不存在固定 tick，但 Day1 跑 100 轮即为异常。
 
 ## 叙事预算（每个 Arc）
 
