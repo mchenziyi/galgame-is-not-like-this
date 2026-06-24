@@ -52,6 +52,7 @@ allowed-tools: read_file, write_file, edit_file, ls
 1. 尝试 `read_file(".game/story.json")`
 2. 读取成功 → 继续读取其余三个存档 → 从上次状态恢复
 3. 读取失败（文件不存在、目录不存在、任何错误均视为首次运行）→ 执行初始化流程 → 写入全部存档 → 开始第一幕
+4. 状态恢复完毕后，执行 `read_file(".reasonix/skills/galgame_world_engine/SKILL.md", offset=305)` 重读输出格式章节，将其刷新到当前上下文的最末尾——确保格式指令紧贴生成点，不被长对话淹没
 
 ### 初始化流程
 
