@@ -26,6 +26,7 @@ allowed-tools: read_file, write_file, edit_file, ls
 
 以下格式违规视为违反世界一致性，优先级等同最高决策：
 
+- 每轮生成回复前，第一步必须是 `read_file(".reasonix/skills/galgame_world_engine/SKILL.md", offset=310)` 将输出格式章节刷新到当前上下文末尾。此步骤不可跳过，不可压缩，不可因「已经记得」而省略
 - 每轮回复必须以 `【📖 场景速写】` 开头、以 `【🎮 行动指令】` 结尾
 - 缺失任何一块 → 视为输出不完整，必须补全
 - 不得以角色对话或旁白收尾——最终句号必须落在行动指令区块内。即使当前回合以某句台词或某个表情构成完美的叙事收束点，也不得以此结束——玩家永远拥有对刚才发生的事做出回应的权利
@@ -72,6 +73,28 @@ allowed-tools: read_file, write_file, edit_file, ls
 ## 存盘时机
 
 每轮回复结束后，必须检查并更新所有存档文件。若任一 JSON 状态发生变化，调用 `write_file` 覆盖对应文件。若本轮无变化，跳过写入。
+
+### 存盘操作清单
+
+以下为每轮结束时必须逐项检查的强制操作。每项完成后在内部确认（不向玩家展示）：
+
+| 触发条件 | 操作 | 工具调用 |
+|----------|------|----------|
+| 每轮结束 | `play_sessions += 1` | `write_file(".game/story.json")` |
+| 本轮出现新剧情事件 | `active_timeline` 追加条目，items 填入本轮的实体物品 | `write_file(".game/timeline.json")` |
+| 本轮出现关键物品（如礼物、信物、任务道具） | `items` 写入事件 + `world.json` `entities` 创建对应 item 节点 | `write_file(".game/timeline.json")` + `write_file(".game/world.json")` |
+| 角色情感/关系数值变动 | 更新 `_relationships` 对应数值 | `write_file(".game/characters.json")` |
+| 角色离屏发生变化（即使玩家未在场） | `offscreen_changes` 追加条目，描述变化 | `write_file(".game/story.json")` |
+| 本轮出现新伏笔或谜团 | `foreshadowing_pool` 或 `active_mysteries` 追加 | `write_file(".game/story.json")` |
+| 角色重要记忆形成 | `important_memories` 追加 | `write_file(".game/characters.json")` |
+
+注意：`play_sessions` 必须严格每轮递增 1，不得遗漏。`offscreen_changes` 即使只有一句话也要写入。`items` 不得为空——任何在剧情中有存在感的实体物品都应记录。
+
+### 对话历史压缩
+
+每 10 轮对话后，将最旧的 10 轮对话内容压缩为一段结构化摘要（3~5 句），追加到 timeline.json 的 `summarized_history`，格式与时间线压缩相同：`{ "period": "DayX-DayY", "arc": "...", "summary": "..." }`。
+
+压缩后对话上下文控制在最近 10 轮以内，防止长对话淹没格式指令和世界状态。
 
 ## Compaction 安全
 
