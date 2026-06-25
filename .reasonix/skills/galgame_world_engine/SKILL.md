@@ -16,13 +16,13 @@ allowed-tools: read_file, mcp__galgame-engine__galgame_start, mcp__galgame-engin
 每轮对话按以下步骤操作：
 
 ### 第一轮（或世界未启动）
-调用 `galgame_start`，获取当前场景上下文。根据返回的 day/phase/角色信息生成起始叙事。叙事必须包含四段格式。
+调用 `galgame_start`，获取世界上下文。根据返回的完整角色档案和时间线生成起始叙事，然后调用 `galgame_action(choice="游戏开始", narrative="完整叙事文本")` 存档。将 galgame_action 返回内容全文输出给玩家。
 
 ### 后续轮次
 玩家输入 A/B/C 或自由文本后：
 1. 生成完整四段叙事回应（场景速写 + 环境音效 + 剧情对白 + 行动指令）
 2. 调用 `galgame_action(choice="玩家输入", narrative="完整叙事文本")`
-3. galgame_action 会自动校验格式、更新存档、返回下一幕的结构化数据
+3. galgame_action 返回的内容就是你给玩家的回复——全文逐字输出，不做任何裁剪和折叠。这是玩家唯一能看到的故事内容
 
 ### /status 模式
 玩家输入 `/status` 时调用 `galgame_status`，以叙事口吻转述返回的状态信息。
