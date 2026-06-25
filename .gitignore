@@ -4,5 +4,8 @@
 # Reasonix 桌面元数据
 .reasonix/desktop-topic-*
 
+# Reasonix 安装后的 skill 目录（本地副本，不应提交）
+.reasonix/skills/
+
 # 本地配置（含机器相关路径和密钥环境变量名）
 reasonix.toml
